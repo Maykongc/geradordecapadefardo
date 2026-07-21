@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Gerador de Capas de Fardo" },
+      { name: "description", content: "Gera PDF com múltiplas capas de fardo para expedição." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Gerador de Capas de Fardo" },
+      { property: "og:description", content: "Gera PDF com múltiplas capas de fardo para expedição." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Gerador de Capas de Fardo" },
+      { name: "twitter:description", content: "Gera PDF com múltiplas capas de fardo para expedição." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/215bf495-ed87-4ca6-933a-385a1d7fea7c/id-preview-dfc225fd--b0f58d64-8dd8-4f6b-9f25-955cc9a656eb.lovable.app-1784595621322.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/215bf495-ed87-4ca6-933a-385a1d7fea7c/id-preview-dfc225fd--b0f58d64-8dd8-4f6b-9f25-955cc9a656eb.lovable.app-1784595621322.png" },
     ],
     links: [
       {
