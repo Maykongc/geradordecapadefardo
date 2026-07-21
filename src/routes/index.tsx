@@ -234,6 +234,13 @@ function desenharCapa(
   doc.setFontSize(30);
   doc.text("ETIQUETA", splitX + rightW / 2, bodyY + topH / 2 + 3, { align: "center" });
 
+  // ===== Topo esquerdo: ROTA (valor grande) =====
+  if (d.rota) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(90);
+    doc.text(d.rota, x + leftW / 2, bodyY + topH / 2 + 12, { align: "center" });
+  }
+
   // ===== Bottom right: FARDO =====
   doc.setFont("helvetica", "bold");
   doc.setFontSize(54);
@@ -249,7 +256,6 @@ function desenharCapa(
 
   // ===== Bottom left: 5 linhas =====
   const rows: Array<[string, string, number]> = [
-    ["ROTA", d.rota, 18],
     ["SEPARAÇÃO", d.separacao, 18],
     ["PEDIDO", d.pedido, 18],
     ["QT CHPs", d.qtChps, 18],
