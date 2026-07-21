@@ -36,7 +36,7 @@ const initial: FormData = {
   qtChps: "",
   matricula: "",
   doca: "",
-  fardos: "1",
+  fardos: "",
 };
 
 function Index() {
