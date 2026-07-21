@@ -245,18 +245,18 @@ function desenharCapa(
   }
 
   // ===== Bottom right: FARDO =====
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(54);
   const fardoCX = splitX + rightW / 2;
   const fardoTopY = bottomY + 22;
-  doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
   if (showFardo) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(54);
+    doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
     doc.setFontSize(72);
     doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
-  }
-  if (showFardo && n === total && total > 1) {
-    doc.setFontSize(40);
-    doc.text("FIM", fardoCX, bottomY + bottomH - 10, { align: "center" });
+    if (n === total && total > 1) {
+      doc.setFontSize(40);
+      doc.text("FIM", fardoCX, bottomY + bottomH - 10, { align: "center" });
+    }
   }
 
   // ===== Bottom left: 5 linhas =====
