@@ -247,10 +247,10 @@ function desenharCapa(
   // ===== Bottom right: FARDO =====
   const fardoCX = splitX + rightW / 2;
   const fardoTopY = bottomY + 22;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(54);
+  doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
   if (showFardo) {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(54);
-    doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
     doc.setFontSize(72);
     doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
     if (n === total && total > 1) {
