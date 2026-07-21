@@ -241,7 +241,7 @@ function desenharCapa(
   doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
   if (n === total && total > 1) {
     doc.setFontSize(40);
-    doc.text("FIM", fardoCX, fardoTopY + 70, { align: "center" });
+    doc.text("FIM", fardoCX, bottomY + bottomH - 10, { align: "center" });
   }
 
   // ===== Bottom left: 5 linhas =====
