@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Operacao = "ROTA" | "CS" | "REAB";
+type Operacao = "ROTA" | "CS" | "REAB" | "";
 
 interface FormData {
   operacao: Operacao;
@@ -28,7 +28,7 @@ interface FormData {
 }
 
 const initial: FormData = {
-  operacao: "ROTA",
+  operacao: "",
   separacao: "",
   pedido: "",
   qtChps: "",
@@ -89,13 +89,13 @@ function Index() {
               Tipo de operação
             </label>
             <div className="flex flex-wrap gap-3">
-              {(["ROTA", "CS", "REAB"] as Operacao[]).map((op) => {
+              {(["ROTA", "CS", "REAB"] as const).map((op) => {
                 const active = data.operacao === op;
                 return (
                   <button
                     key={op}
                     type="button"
-                    onClick={() => update("operacao", op)}
+                    onClick={() => update("operacao", active ? "" : op)}
                     className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors border ${
                       active
                         ? "bg-[#0d4a3a] text-white border-[#0d4a3a]"
@@ -233,12 +233,16 @@ function desenharCapa(
 
   // ===== Bottom right: FARDO =====
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(44);
+  doc.setFontSize(54);
   const fardoCX = splitX + rightW / 2;
-  const fardoTopY = bottomY + 18;
+  const fardoTopY = bottomY + 22;
   doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
-  doc.setFontSize(52);
-  doc.text(`${n}/${total}`, fardoCX, fardoTopY + 30, { align: "center" });
+  doc.setFontSize(72);
+  doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
+  if (n === total && total > 1) {
+    doc.setFontSize(40);
+    doc.text("FIM", fardoCX, fardoTopY + 70, { align: "center" });
+  }
 
   // ===== Bottom left: 5 linhas =====
   const rows: Array<[string, string, number]> = [
