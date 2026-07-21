@@ -48,7 +48,9 @@ function Index() {
   const gerarPDF = (e: FormEvent) => {
     e.preventDefault();
 
-    const total = Math.max(1, Math.min(999, parseInt(data.fardos, 10) || 1));
+    const parsed = parseInt(data.fardos, 10);
+    const hasFardos = !isNaN(parsed) && parsed > 0;
+    const total = hasFardos ? Math.min(999, parsed) : 1;
 
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
@@ -56,7 +58,7 @@ function Index() {
 
     for (let i = 1; i <= total; i++) {
       if (i > 1) doc.addPage();
-      desenharCapa(doc, data, i, total, pageW, pageH);
+      desenharCapa(doc, data, i, total, pageW, pageH, hasFardos);
     }
 
     const pedidoSafe = (data.pedido.trim() || "capas").replace(/\s+/g, "_");
@@ -184,6 +186,7 @@ function desenharCapa(
   total: number,
   pageW: number,
   pageH: number,
+  showFardo: boolean,
 ) {
   const margin = 10;
   const x = margin;
@@ -242,16 +245,18 @@ function desenharCapa(
   }
 
   // ===== Bottom right: FARDO =====
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(54);
   const fardoCX = splitX + rightW / 2;
   const fardoTopY = bottomY + 22;
-  doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
-  doc.setFontSize(72);
-  doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
-  if (n === total && total > 1) {
-    doc.setFontSize(40);
-    doc.text("FIM", fardoCX, bottomY + bottomH - 10, { align: "center" });
+  if (showFardo) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(54);
+    doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
+    doc.setFontSize(72);
+    doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
+    if (n === total && total > 1) {
+      doc.setFontSize(40);
+      doc.text("FIM", fardoCX, bottomY + bottomH - 10, { align: "center" });
+    }
   }
 
   // ===== Bottom left: 5 linhas =====
