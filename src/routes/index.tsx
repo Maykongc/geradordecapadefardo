@@ -186,6 +186,7 @@ function desenharCapa(
   total: number,
   pageW: number,
   pageH: number,
+  showFardo: boolean,
 ) {
   const margin = 10;
   const x = margin;
@@ -249,9 +250,11 @@ function desenharCapa(
   const fardoCX = splitX + rightW / 2;
   const fardoTopY = bottomY + 22;
   doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
-  doc.setFontSize(72);
-  doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
-  if (n === total && total > 1) {
+  if (showFardo) {
+    doc.setFontSize(72);
+    doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
+  }
+  if (showFardo && n === total && total > 1) {
     doc.setFontSize(40);
     doc.text("FIM", fardoCX, bottomY + bottomH - 10, { align: "center" });
   }
