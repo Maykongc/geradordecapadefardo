@@ -48,7 +48,9 @@ function Index() {
   const gerarPDF = (e: FormEvent) => {
     e.preventDefault();
 
-    const total = Math.max(1, Math.min(999, parseInt(data.fardos, 10) || 1));
+    const parsed = parseInt(data.fardos, 10);
+    const hasFardos = !isNaN(parsed) && parsed > 0;
+    const total = hasFardos ? Math.min(999, parsed) : 1;
 
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
@@ -56,7 +58,7 @@ function Index() {
 
     for (let i = 1; i <= total; i++) {
       if (i > 1) doc.addPage();
-      desenharCapa(doc, data, i, total, pageW, pageH);
+      desenharCapa(doc, data, i, total, pageW, pageH, hasFardos);
     }
 
     const pedidoSafe = (data.pedido.trim() || "capas").replace(/\s+/g, "_");
