@@ -19,6 +19,7 @@ type Operacao = "ROTA" | "CS" | "REAB" | "";
 
 interface FormData {
   operacao: Operacao;
+  rota: string;
   separacao: string;
   pedido: string;
   qtChps: string;
@@ -29,6 +30,7 @@ interface FormData {
 
 const initial: FormData = {
   operacao: "",
+  rota: "",
   separacao: "",
   pedido: "",
   qtChps: "",
@@ -109,6 +111,7 @@ function Index() {
             </div>
           </div>
 
+          <Field label="ROTA" value={data.rota} onChange={(v) => update("rota", v)} />
           <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} />
           <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} />
           <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} type="number" />
@@ -246,6 +249,7 @@ function desenharCapa(
 
   // ===== Bottom left: 5 linhas =====
   const rows: Array<[string, string, number]> = [
+    ["ROTA", d.rota, 18],
     ["SEPARAÇÃO", d.separacao, 18],
     ["PEDIDO", d.pedido, 18],
     ["QT CHPs", d.qtChps, 18],
