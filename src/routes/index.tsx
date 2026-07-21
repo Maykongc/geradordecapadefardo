@@ -237,8 +237,8 @@ function desenharCapa(
   // ===== Topo esquerdo: ROTA (valor grande) =====
   if (d.rota) {
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(90);
-    doc.text(d.rota, x + leftW / 2, bodyY + topH / 2 + 12, { align: "center" });
+    doc.setFontSize(160);
+    doc.text(d.rota, x + leftW / 2, bodyY + topH / 2 + 20, { align: "center" });
   }
 
   // ===== Bottom right: FARDO =====
