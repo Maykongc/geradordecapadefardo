@@ -6,7 +6,10 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Gerador de Capas de Fardo" },
-      { name: "description", content: "Gera PDF com múltiplas capas de fardo para expedição." },
+      {
+        name: "description",
+        content: "Gere PDFs A4 paisagem com capas de fardo para expedição.",
+      },
     ],
   }),
   component: Index,
@@ -16,7 +19,6 @@ type Operacao = "ROTA" | "CS" | "REAB";
 
 interface FormData {
   operacao: Operacao;
-  etiqueta: string;
   separacao: string;
   pedido: string;
   qtChps: string;
@@ -27,7 +29,6 @@ interface FormData {
 
 const initial: FormData = {
   operacao: "ROTA",
-  etiqueta: "",
   separacao: "",
   pedido: "",
   qtChps: "",
@@ -38,25 +39,14 @@ const initial: FormData = {
 
 function Index() {
   const [data, setData] = useState<FormData>(initial);
-  const [error, setError] = useState<string | null>(null);
 
   const update = <K extends keyof FormData>(k: K, v: FormData[K]) =>
     setData((d) => ({ ...d, [k]: v }));
 
   const gerarPDF = (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
 
-    const total = parseInt(data.fardos, 10);
-    if (!data.separacao.trim() || !data.pedido.trim() || !data.qtChps.trim() ||
-        !data.matricula.trim() || !data.doca.trim()) {
-      setError("Preencha todos os campos obrigatórios.");
-      return;
-    }
-    if (!Number.isFinite(total) || total < 1 || total > 999) {
-      setError("Quantidade de fardos deve ser entre 1 e 999.");
-      return;
-    }
+    const total = Math.max(1, Math.min(999, parseInt(data.fardos, 10) || 1));
 
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
@@ -67,85 +57,83 @@ function Index() {
       desenharCapa(doc, data, i, total, pageW, pageH);
     }
 
-    const nome = `capas_fardo_${data.pedido.trim().replace(/\s+/g, "_")}.pdf`;
-    doc.save(nome);
+    const pedidoSafe = (data.pedido.trim() || "capas").replace(/\s+/g, "_");
+    doc.save(`capas_fardo_${pedidoSafe}.pdf`);
   };
 
-  const limpar = () => {
-    setData(initial);
-    setError(null);
-  };
+  const limpar = () => setData(initial);
 
   return (
-    <main className="min-h-screen bg-slate-50 py-8 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-[#f7f1e3] via-[#faf6ea] to-[#f2ead5] py-10 px-4">
       <div className="max-w-3xl mx-auto">
-        <header className="mb-6">
-          <div className="inline-block bg-[#7DBB57] text-black font-black text-2xl px-4 py-2 rounded">
-            Gerador de Capas de Fardo
+        <header className="mb-8 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-[#0d4a3a] flex items-center justify-center text-white text-2xl font-bold shadow-sm">
+            F
           </div>
-          <p className="mt-3 text-slate-600 text-sm">
-            Preencha os dados de expedição e gere o PDF com uma capa por fardo.
-          </p>
+          <div>
+            <h1 className="text-2xl font-bold text-[#0d2a22]">
+              Gerador de Capas de Fardo
+            </h1>
+            <p className="text-sm text-[#5a5a4d]">
+              Preencha os dados e gere o PDF com uma capa por fardo.
+            </p>
+          </div>
         </header>
 
         <form
           onSubmit={gerarPDF}
-          className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-5"
+          className="bg-white/90 backdrop-blur rounded-2xl shadow-sm border border-[#e6dfc9] p-6 space-y-5"
         >
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Tipo de operação *
+            <label className="block text-sm font-semibold text-[#0d2a22] mb-2">
+              Tipo de operação
             </label>
-            <div className="flex gap-4">
-              {(["ROTA", "CS", "REAB"] as Operacao[]).map((op) => (
-                <label key={op} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="operacao"
-                    value={op}
-                    checked={data.operacao === op}
-                    onChange={() => update("operacao", op)}
-                    className="accent-[#7DBB57]"
-                  />
-                  <span className="font-medium">{op}</span>
-                </label>
-              ))}
+            <div className="flex flex-wrap gap-3">
+              {(["ROTA", "CS", "REAB"] as Operacao[]).map((op) => {
+                const active = data.operacao === op;
+                return (
+                  <button
+                    key={op}
+                    type="button"
+                    onClick={() => update("operacao", op)}
+                    className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors border ${
+                      active
+                        ? "bg-[#0d4a3a] text-white border-[#0d4a3a]"
+                        : "bg-white text-[#0d2a22] border-[#e6dfc9] hover:bg-[#f7f1e3]"
+                    }`}
+                  >
+                    {op}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <Field label="ETIQUETA" value={data.etiqueta} onChange={(v) => update("etiqueta", v)} />
-          <Field label="SEPARAÇÃO *" value={data.separacao} onChange={(v) => update("separacao", v)} required />
-          <Field label="PEDIDO *" value={data.pedido} onChange={(v) => update("pedido", v)} required />
-          <Field label="QT CHPs *" value={data.qtChps} onChange={(v) => update("qtChps", v)} required type="number" />
-          <Field label="MATRICULA SEPARADOR *" value={data.matricula} onChange={(v) => update("matricula", v)} required />
-          <Field label="DOCA EXPEDIÇÃO *" value={data.doca} onChange={(v) => update("doca", v)} required />
+          <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} />
+          <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} />
+          <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} type="number" />
+          <Field label="MATRICULA SEPARADOR" value={data.matricula} onChange={(v) => update("matricula", v)} />
+          <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} />
           <Field
-            label="QUANTIDADE DE FARDOS *"
+            label="QUANTIDADE DE FARDOS"
             value={data.fardos}
             onChange={(v) => update("fardos", v)}
-            required
             type="number"
             min={1}
             max={999}
           />
 
-          {error && (
-            <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded p-3">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-wrap gap-3 pt-2">
             <button
               type="submit"
-              className="bg-[#7DBB57] hover:bg-[#6ba847] text-black font-bold px-5 py-2.5 rounded transition-colors"
+              className="bg-[#0d4a3a] hover:bg-[#0a3b2e] text-white font-semibold px-5 py-2.5 rounded-lg transition-colors shadow-sm"
             >
               Gerar PDF
             </button>
             <button
               type="button"
               onClick={limpar}
-              className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium px-5 py-2.5 rounded transition-colors"
+              className="bg-white hover:bg-[#f7f1e3] text-[#0d2a22] font-medium px-5 py-2.5 rounded-lg transition-colors border border-[#e6dfc9]"
             >
               Limpar formulário
             </button>
@@ -160,7 +148,6 @@ function Field({
   label,
   value,
   onChange,
-  required,
   type = "text",
   min,
   max,
@@ -168,22 +155,20 @@ function Field({
   label: string;
   value: string;
   onChange: (v: string) => void;
-  required?: boolean;
   type?: string;
   min?: number;
   max?: number;
 }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-slate-700 mb-1">{label}</label>
+      <label className="block text-sm font-semibold text-[#0d2a22] mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        required={required}
         min={min}
         max={max}
-        className="w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7DBB57] focus:border-transparent"
+        className="w-full border border-[#e6dfc9] bg-white rounded-lg px-3 py-2 text-[#0d2a22] focus:outline-none focus:ring-2 focus:ring-[#0d4a3a] focus:border-transparent"
       />
     </div>
   );
@@ -203,81 +188,88 @@ function desenharCapa(
   const w = pageW - margin * 2;
   const h = pageH - margin * 2;
 
-  const headerH = 25;
-  const rightW = w * 0.35;
-  const leftW = w - rightW;
+  const headerH = 28;
   const bodyY = y + headerH;
   const bodyH = h - headerH;
 
-  // Header verde
+  // Right column narrower (like image ~30%)
+  const rightW = w * 0.3;
+  const leftW = w - rightW;
+  const splitX = x + leftW;
+
+  // Top area (empty on left, ETIQUETA on right) ~ 45% of body
+  const topH = bodyH * 0.45;
+  const bottomY = bodyY + topH;
+  const bottomH = bodyH - topH;
+
+  // ===== Header verde =====
   doc.setFillColor(125, 187, 87);
   doc.rect(x, y, w, headerH, "F");
   doc.setDrawColor(0);
-  doc.setLineWidth(0.6);
+  doc.setLineWidth(0.8);
   doc.rect(x, y, w, headerH);
 
   doc.setTextColor(0);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(28);
-  const mark = (op: string) => (d.operacao === op ? "X" : " ");
+  doc.setFontSize(34);
+  const mark = (op: string) => (d.operacao === op ? "X" : "   ");
   const headerText = `ROTA(${mark("ROTA")}) CS(${mark("CS")}) REAB(${mark("REAB")})`;
-  doc.text(headerText, x + w / 2, y + headerH / 2 + 3, { align: "center" });
+  doc.text(headerText, x + w / 2, y + headerH / 2 + 4, { align: "center" });
 
-  // Corpo — moldura
+  // ===== Moldura externa do corpo =====
   doc.rect(x, bodyY, w, bodyH);
 
-  // Divisão vertical esquerda/direita
-  const splitX = x + leftW;
+  // Divisão vertical esquerda / direita
   doc.line(splitX, bodyY, splitX, bodyY + bodyH);
 
-  // Esquerda: célula superior vazia + linhas de campos
-  const topCellH = bodyH * 0.35;
-  const rowsY = bodyY + topCellH;
-  doc.line(x, rowsY, splitX, rowsY);
+  // Divisão horizontal (topo / linhas)
+  doc.line(x, bottomY, splitX, bottomY);
+  doc.line(splitX, bottomY, x + w, bottomY);
 
+  // ===== Topo direito: ETIQUETA =====
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(30);
+  doc.text("ETIQUETA", splitX + rightW / 2, bodyY + topH / 2 + 3, { align: "center" });
+
+  // ===== Bottom right: FARDO =====
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(44);
+  const fardoCX = splitX + rightW / 2;
+  const fardoTopY = bottomY + 18;
+  doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
+  doc.setFontSize(52);
+  doc.text(`${n}/${total}`, fardoCX, fardoTopY + 30, { align: "center" });
+
+  // ===== Bottom left: 5 linhas =====
   const rows: Array<[string, string, number]> = [
-    ["SEPARAÇÃO", d.separacao, 16],
-    ["PEDIDO", d.pedido, 14],
-    ["QT CHPs", d.qtChps, 14],
-    ["MATRICULA SEPARADOR", d.matricula, 11],
-    ["DOCA EXPEDIÇÃO", d.doca, 13],
+    ["SEPARAÇÃO", d.separacao, 18],
+    ["PEDIDO", d.pedido, 18],
+    ["QT CHPs", d.qtChps, 18],
+    ["MATRICULA SEPARADOR", d.matricula, 12],
+    ["DOCA EXPEDIÇÃO", d.doca, 16],
   ];
-  const rowH = (bodyY + bodyH - rowsY) / rows.length;
-  const labelColW = leftW * 0.5;
+  const rowH = bottomH / rows.length;
+  const labelColW = leftW * 0.42;
 
   rows.forEach((row, idx) => {
     const [label, value, size] = row;
-    const ry = rowsY + rowH * idx;
+    const ry = bottomY + rowH * idx;
     if (idx > 0) doc.line(x, ry, splitX, ry);
-    // divisor label/valor
     doc.line(x + labelColW, ry, x + labelColW, ry + rowH);
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(size);
     doc.text(label, x + labelColW / 2, ry + rowH / 2 + size / 8, { align: "center" });
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(14);
-    doc.text(value || "", x + labelColW + (leftW - labelColW) / 2, ry + rowH / 2 + 2, {
-      align: "center",
-    });
+
+    if (value) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(18);
+      doc.text(
+        value,
+        x + labelColW + (leftW - labelColW) / 2,
+        ry + rowH / 2 + 3,
+        { align: "center" },
+      );
+    }
   });
-
-  // Direita: ETIQUETA topo, FARDO embaixo
-  const rightTopH = bodyH * 0.35;
-  doc.line(splitX, bodyY + rightTopH, x + w, bodyY + rightTopH);
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.text("ETIQUETA", splitX + rightW / 2, bodyY + 12, { align: "center" });
-  if (d.etiqueta) {
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(16);
-    doc.text(d.etiqueta, splitX + rightW / 2, bodyY + 22, { align: "center" });
-  }
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(36);
-  const fardoCenterY = bodyY + rightTopH + (bodyH - rightTopH) / 2;
-  doc.text("FARDO", splitX + rightW / 2, fardoCenterY - 8, { align: "center" });
-  doc.setFontSize(42);
-  doc.text(`${n}/${total}`, splitX + rightW / 2, fardoCenterY + 20, { align: "center" });
 }
