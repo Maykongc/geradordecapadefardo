@@ -65,6 +65,14 @@ function Index() {
     doc.save(`capas_fardo_${pedidoSafe}.pdf`);
   };
 
+  const gerarBranco = () => {
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    desenharCapa(doc, initial, 1, 1, pageW, pageH, false);
+    doc.save("capa_em_branco.pdf");
+  };
+
   const limpar = () => setData(initial);
 
   return (
@@ -113,12 +121,12 @@ function Index() {
             </div>
           </div>
 
-          <Field label="ROTA" value={data.rota} onChange={(v) => update("rota", v)} />
-          <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} />
-          <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} />
-          <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} type="number" />
+          <Field label="ROTA" value={data.rota} onChange={(v) => update("rota", v)} required />
+          <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} required />
+          <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} required />
+          <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} type="number" required />
           <Field label="MATRICULA SEPARADOR" value={data.matricula} onChange={(v) => update("matricula", v)} />
-          <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} />
+          <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} required />
           <Field
             label="QUANTIDADE DE FARDOS"
             value={data.fardos}
@@ -126,6 +134,7 @@ function Index() {
             type="number"
             min={1}
             max={999}
+            required
           />
 
           <div className="flex flex-wrap gap-3 pt-2">
@@ -134,6 +143,13 @@ function Index() {
               className="bg-[#0d4a3a] hover:bg-[#0a3b2e] text-white font-semibold px-5 py-2.5 rounded-lg transition-colors shadow-sm"
             >
               Gerar PDF
+            </button>
+            <button
+              type="button"
+              onClick={gerarBranco}
+              className="bg-white hover:bg-[#f7f1e3] text-[#0d2a22] font-semibold px-5 py-2.5 rounded-lg transition-colors border border-[#e6dfc9]"
+            >
+              CAPA EM BRANCO
             </button>
             <button
               type="button"
@@ -156,6 +172,7 @@ function Field({
   type = "text",
   min,
   max,
+  required,
 }: {
   label: string;
   value: string;
@@ -163,16 +180,21 @@ function Field({
   type?: string;
   min?: number;
   max?: number;
+  required?: boolean;
 }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-[#0d2a22] mb-1">{label}</label>
+      <label className="block text-sm font-semibold text-[#0d2a22] mb-1">
+        {label}
+        {required && <span className="text-[#0d4a3a]"> *</span>}
+      </label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         min={min}
         max={max}
+        required={required}
         className="w-full border border-[#e6dfc9] bg-white rounded-lg px-3 py-2 text-[#0d2a22] focus:outline-none focus:ring-2 focus:ring-[#0d4a3a] focus:border-transparent"
       />
     </div>
