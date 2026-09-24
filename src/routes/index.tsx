@@ -204,6 +204,12 @@ function Field({
   );
 }
 
+function formatData(iso: string) {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!partes) return iso;
+  return `${partes[3]}/${partes[2]}/${partes[1]}`;
+}
+
 function desenharCapa(
   doc: jsPDF,
   d: FormData,
