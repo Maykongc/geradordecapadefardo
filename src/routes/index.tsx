@@ -176,6 +176,8 @@ function Field({
   min,
   max,
   required,
+  numeric,
+  maxLength,
 }: {
   label: string;
   value: string;
@@ -184,25 +186,43 @@ function Field({
   min?: number;
   max?: number;
   required?: boolean;
+  numeric?: boolean;
+  maxLength?: number;
 }) {
+  const handleChange = (raw: string) => {
+    if (!numeric) return onChange(raw);
+    // Mantém apenas dígitos (0-9), sem letras, espaços ou sinais.
+    onChange(raw.replace(/\D/g, ""));
+  };
+
   return (
     <div>
       <label className="block text-sm font-semibold text-[#0d2a22] mb-1">
         {label}
         {required && <span className="text-[#0d4a3a]"> *</span>}
+        {numeric && (
+          <span className="ml-2 text-xs font-normal text-[#8a8a78]">
+            somente números
+          </span>
+        )}
       </label>
       <input
-        type={type}
+        type={numeric ? "text" : type}
+        inputMode={numeric ? "numeric" : undefined}
+        pattern={numeric ? "[0-9]*" : undefined}
+        title={numeric ? "Digite somente números" : undefined}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         min={min}
         max={max}
+        maxLength={maxLength}
         required={required}
         className="w-full border border-[#e6dfc9] bg-white rounded-lg px-3 py-2 text-[#0d2a22] focus:outline-none focus:ring-2 focus:ring-[#0d4a3a] focus:border-transparent"
       />
     </div>
   );
 }
+
 
 function formatData(iso: string) {
   const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
