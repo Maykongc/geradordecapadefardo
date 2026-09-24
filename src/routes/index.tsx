@@ -26,6 +26,7 @@ interface FormData {
   matricula: string;
   doca: string;
   fardos: string;
+  data: string;
 }
 
 const initial: FormData = {
@@ -37,6 +38,7 @@ const initial: FormData = {
   matricula: "",
   doca: "",
   fardos: "",
+  data: "",
 };
 
 function Index() {
@@ -127,6 +129,7 @@ function Index() {
           <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} type="number" required />
           <Field label="MATRICULA SEPARADOR" value={data.matricula} onChange={(v) => update("matricula", v)} />
           <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} required />
+          <Field label="DATA" value={data.data} onChange={(v) => update("data", v)} type="date" required />
           <Field
             label="QUANTIDADE DE FARDOS"
             value={data.fardos}
@@ -266,18 +269,23 @@ function desenharCapa(
     doc.text(d.rota, x + leftW / 2, bodyY + topH / 2 + 20, { align: "center" });
   }
 
-  // ===== Bottom right: FARDO =====
+  // ===== Bottom right: DATA + FARDO =====
   const fardoCX = splitX + rightW / 2;
-  const fardoTopY = bottomY + 22;
+  if (d.data) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(formatData(d.data), fardoCX, bottomY + 12, { align: "center" });
+  }
+  const fardoTopY = bottomY + 30;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(54);
   doc.text("FARDO", fardoCX, fardoTopY, { align: "center" });
   if (showFardo) {
     doc.setFontSize(72);
-    doc.text(`${n}/${total}`, fardoCX, fardoTopY + 38, { align: "center" });
+    doc.text(`${n}/${total}`, fardoCX, fardoTopY + 36, { align: "center" });
     if (n === total && total > 1) {
       doc.setFontSize(40);
-      doc.text("FIM", fardoCX, bottomY + bottomH - 10, { align: "center" });
+      doc.text("FIM", fardoCX, bottomY + bottomH - 8, { align: "center" });
     }
   }
 
