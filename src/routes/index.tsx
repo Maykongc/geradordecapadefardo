@@ -123,22 +123,22 @@ function Index() {
             </div>
           </div>
 
-          <Field label="ROTA" value={data.rota} onChange={(v) => update("rota", v)} required />
-          <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} required />
-          <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} required />
-          <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} type="number" required />
+          <Field label="ROTA" value={data.rota} onChange={(v) => update("rota", v)} required numeric maxLength={8} />
+          <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} required numeric maxLength={12} />
+          <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} required numeric maxLength={12} />
+          <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} required numeric maxLength={8} />
           <Field label="MATRICULA SEPARADOR" value={data.matricula} onChange={(v) => update("matricula", v)} />
-          <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} required />
+          <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} required numeric maxLength={6} />
           <Field label="DATA" value={data.data} onChange={(v) => update("data", v)} type="date" required />
           <Field
             label="QUANTIDADE DE FARDOS"
             value={data.fardos}
             onChange={(v) => update("fardos", v)}
-            type="number"
-            min={1}
-            max={999}
+            numeric
+            maxLength={3}
             required
           />
+
 
           <div className="flex flex-wrap gap-3 pt-2">
             <button
