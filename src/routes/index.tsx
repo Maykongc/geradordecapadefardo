@@ -123,22 +123,22 @@ function Index() {
             </div>
           </div>
 
-          <Field label="ROTA" value={data.rota} onChange={(v) => update("rota", v)} required />
-          <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} required />
-          <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} required />
-          <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} type="number" required />
+          <Field label="ROTA" value={data.rota} onChange={(v) => update("rota", v)} required numeric maxLength={8} />
+          <Field label="SEPARAÇÃO" value={data.separacao} onChange={(v) => update("separacao", v)} required numeric maxLength={12} />
+          <Field label="PEDIDO" value={data.pedido} onChange={(v) => update("pedido", v)} required numeric maxLength={12} />
+          <Field label="QT CHPs" value={data.qtChps} onChange={(v) => update("qtChps", v)} required numeric maxLength={8} />
           <Field label="MATRICULA SEPARADOR" value={data.matricula} onChange={(v) => update("matricula", v)} />
-          <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} required />
+          <Field label="DOCA EXPEDIÇÃO" value={data.doca} onChange={(v) => update("doca", v)} required numeric maxLength={6} />
           <Field label="DATA" value={data.data} onChange={(v) => update("data", v)} type="date" required />
           <Field
             label="QUANTIDADE DE FARDOS"
             value={data.fardos}
             onChange={(v) => update("fardos", v)}
-            type="number"
-            min={1}
-            max={999}
+            numeric
+            maxLength={3}
             required
           />
+
 
           <div className="flex flex-wrap gap-3 pt-2">
             <button
@@ -176,6 +176,8 @@ function Field({
   min,
   max,
   required,
+  numeric,
+  maxLength,
 }: {
   label: string;
   value: string;
@@ -184,25 +186,43 @@ function Field({
   min?: number;
   max?: number;
   required?: boolean;
+  numeric?: boolean;
+  maxLength?: number;
 }) {
+  const handleChange = (raw: string) => {
+    if (!numeric) return onChange(raw);
+    // Mantém apenas dígitos (0-9), sem letras, espaços ou sinais.
+    onChange(raw.replace(/\D/g, ""));
+  };
+
   return (
     <div>
       <label className="block text-sm font-semibold text-[#0d2a22] mb-1">
         {label}
         {required && <span className="text-[#0d4a3a]"> *</span>}
+        {numeric && (
+          <span className="ml-2 text-xs font-normal text-[#8a8a78]">
+            somente números
+          </span>
+        )}
       </label>
       <input
-        type={type}
+        type={numeric ? "text" : type}
+        inputMode={numeric ? "numeric" : undefined}
+        pattern={numeric ? "[0-9]*" : undefined}
+        title={numeric ? "Digite somente números" : undefined}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         min={min}
         max={max}
+        maxLength={maxLength}
         required={required}
         className="w-full border border-[#e6dfc9] bg-white rounded-lg px-3 py-2 text-[#0d2a22] focus:outline-none focus:ring-2 focus:ring-[#0d4a3a] focus:border-transparent"
       />
     </div>
   );
 }
+
 
 function formatData(iso: string) {
   const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
