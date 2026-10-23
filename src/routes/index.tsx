@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Operacao = "ROTA" | "CS" | "REAB" | "";
+type Operacao = "ROTA" | "CS" | "REAB" | "1036" | "";
 
 interface FormData {
   operacao: Operacao;
@@ -103,7 +103,7 @@ function Index() {
               Tipo de operação
             </label>
             <div className="flex flex-wrap gap-3">
-              {(["ROTA", "CS", "REAB"] as const).map((op) => {
+              {(["ROTA", "CS", "REAB", "1036"] as const).map((op) => {
                 const active = data.operacao === op;
                 return (
                   <button
@@ -270,7 +270,8 @@ function desenharCapa(
   doc.setFont("helvetica", "bold");
   doc.setFontSize(34);
   const mark = (op: string) => (d.operacao === op ? "X" : "   ");
-  const headerText = `ROTA(${mark("ROTA")}) CS(${mark("CS")}) REAB(${mark("REAB")})`;
+  const headerText =
+    d.operacao === "1036" ? "1036" : `ROTA(${mark("ROTA")}) CS(${mark("CS")}) REAB(${mark("REAB")})`;
   doc.text(headerText, x + w / 2, y + headerH / 2 + 4, { align: "center" });
 
   // ===== Moldura externa do corpo =====
