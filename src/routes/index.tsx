@@ -47,6 +47,10 @@ function Index() {
   const update = <K extends keyof FormData>(k: K, v: FormData[K]) =>
     setData((d) => ({ ...d, [k]: v }));
 
+  // Com o 1036 selecionado nenhum campo é obrigatório.
+  const exigiveis = data.operacao !== "1036";
+
+
   const gerarPDF = (e: FormEvent) => {
     e.preventDefault();
 
