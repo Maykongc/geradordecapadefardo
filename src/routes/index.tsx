@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Operacao = "ROTA" | "CS" | "REAB" | "1036" | "";
+type Operacao = "ROTA" | "CS" | "REAB" | "1036" | "1058" | "1097" | "";
 
 interface FormData {
   operacao: Operacao;
@@ -48,11 +48,19 @@ function Index() {
     setData((d) => ({ ...d, [k]: v }));
 
   // Com o 1036 selecionado nenhum campo é obrigatório.
-  const exigiveis = data.operacao !== "1036";
+  const controle = data.operacao === "1058" || data.operacao === "1097";
+  const exigiveis = data.operacao !== "1036" && !controle;
 
 
   const gerarPDF = (e: FormEvent) => {
     e.preventDefault();
+
+    if (data.operacao === "1058" || data.operacao === "1097") {
+      const cdoc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      desenharControle(cdoc, data);
+      cdoc.save(`controle_entrega_${data.operacao}.pdf`);
+      return;
+    }
 
     const parsed = parseInt(data.fardos, 10);
     const hasFardos = !isNaN(parsed) && parsed > 0;
@@ -107,7 +115,7 @@ function Index() {
               Tipo de operação
             </label>
             <div className="flex flex-wrap gap-3">
-              {(["ROTA", "CS", "REAB", "1036"] as const).map((op) => {
+              {(["ROTA", "CS", "REAB", "1036", "1058", "1097"] as const).map((op) => {
                 const active = data.operacao === op;
                 return (
                   <button
@@ -353,4 +361,56 @@ function desenharCapa(
       );
     }
   });
+}
+function desenharControle(doc: jsPDF, d: FormData) {
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const w = 170;
+  const x = (pageW - w) / 2;
+  const margin = 12;
+  const gap = 8;
+  const blocoH = (pageH - margin * 2 - gap * 3) / 4;
+  const colW = w / 2;
+  // proporções da planilha: título, cabeçalho, valor (2 linhas), data, assinatura
+  const partes = [1.2, 0.9, 2, 1, 1];
+  const soma = partes.reduce((a, b) => a + b, 0);
+  const alturas = partes.map((p) => (p / soma) * blocoH);
+
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.setTextColor(0);
+
+  for (let b = 0; b < 4; b++) {
+    let y = margin + b * (blocoH + gap);
+    const [hT, hC, hV, hD, hA] = alturas;
+    doc.rect(x, y, w, blocoH);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text(`CONTROLE DE ENTREGA ${d.operacao}`, x + w / 2, y + hT / 2 + 2.5, { align: "center" });
+    y += hT;
+    doc.line(x, y, x + w, y);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(16);
+    doc.text("Nº SEPARAÇÃO", x + colW / 2, y + hC / 2 + 2, { align: "center" });
+    doc.text("QT CHAP", x + colW + colW / 2, y + hC / 2 + 2, { align: "center" });
+    doc.line(x + colW, y, x + colW, y + hC + hV);
+    y += hC;
+    doc.line(x, y, x + w, y);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(28);
+    if (d.separacao) doc.text(d.separacao, x + colW / 2, y + hV / 2 + 3.5, { align: "center" });
+    if (d.qtChps) doc.text(d.qtChps, x + colW + colW / 2, y + hV / 2 + 3.5, { align: "center" });
+    y += hV;
+    doc.line(x, y, x + w, y);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(16);
+    doc.text(`DATA: ${d.data ? formatData(d.data) : ""}`, x + 4, y + hD / 2 + 2);
+    y += hD;
+    doc.line(x, y, x + w, y);
+    doc.text("ASS CONFERENTE:", x + 4, y + hA / 2 + 2);
+  }
 }
