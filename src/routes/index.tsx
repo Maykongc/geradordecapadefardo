@@ -387,7 +387,8 @@ function desenharControle(doc: jsPDF, d: FormData) {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text(`CONTROLE DE ENTREGA ${d.operacao}`, x + w / 2, y + hT / 2 + 2.5, { align: "center" });
+    const titulo = d.operacao === "1058" ? "1058 (LOJA)" : d.operacao;
+    doc.text(`CONTROLE DE ENTREGA ${titulo}`, x + w / 2, y + hT / 2 + 2.5, { align: "center" });
     y += hT;
     doc.line(x, y, x + w, y);
 
